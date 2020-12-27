@@ -1,0 +1,5 @@
+rootProject.name = 'annotation-procesor-playground'
+include 'example'
+include 'example-annotation'
+include 'example-processor'
+

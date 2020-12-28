@@ -75,7 +75,7 @@ class ConstantProcessor : AbstractProcessor() {
             .build()
         file.writeTo(File(generatedSource))
 
-        return false
+        return true
     }
 
     private fun ProcessingEnvironment.noteMessage(message: () -> String) {

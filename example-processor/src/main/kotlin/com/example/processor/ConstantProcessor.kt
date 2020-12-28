@@ -25,67 +25,65 @@ class ConstantProcessor : AbstractProcessor() {
 
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         if (roundEnv == null) {
-            processingEnv.noteMessage { "RoundEnvironment is null hence skip process." }
+            processingEnv.noteMessage { "RoundEnvironment is null hence skip the process." }
             return false
         }
 
         if (annotations == null || annotations.isEmpty()) {
-            processingEnv.noteMessage { "TypeElements is null or empty hence skip process." }
+            processingEnv.noteMessage { "TypeElements is null or empty hence skip the process." }
             return false
         }
 
         val elements = roundEnv.getElementsAnnotatedWith(Constant::class.java)
         if (elements.isEmpty()) {
-            processingEnv.errorMessage { "Not able to find elements which annotated with ${Constant::class.java.name}" }
+            processingEnv.noteMessage { "Not able to find ${Constant::class.java} in RoundEnvironment." }
             return false
         }
 
-        val generatedSourceRoot = processingEnv.options[KAPT_KOTLIN_GENERATED] ?: run {
-            processingEnv.errorMessage { "Can't find source kotlin generated directory" }
+        val generatedSource = processingEnv.options[KAPT_KOTLIN_GENERATED] ?: run {
+            processingEnv.errorMessage { "Can't find target source." }
             return false
         }
-
-        processingEnv.noteMessage { "Generating ${Constant::class.java.name} size ; ${annotations.size}" }
 
         val packageName = "com.example"
-        var fileName = ""
-        var objectBuilder: TypeSpec.Builder? = null
+        val fileName = "ConstantGenerated"
+
+        // create object builder
+        val objectBuilder = TypeSpec.objectBuilder(fileName)
 
         for (element in elements) {
-            fileName = "${element.simpleName}"
             val annotated = element.getAnnotation(Constant::class.java)
             val propName = annotated.propName
             val propValue = annotated.propValue
-            val propertyBuilder = PropertySpec.builder(
+
+            // crate property
+            val propBuilder = PropertySpec.builder(
                 name = propName,
                 type = ClassName("kotlin", "String"),
-                modifiers = arrayOf(KModifier.FINAL, KModifier.CONST)
+                modifiers = arrayOf(KModifier.CONST, KModifier.FINAL)
             ).mutable(false).initializer("\"$propValue\"")
 
-            objectBuilder = TypeSpec.objectBuilder(fileName)
-                .apply {
-                    addProperty(propertyBuilder.build())
-                }
+            objectBuilder.addProperty(propBuilder.build())
         }
 
+        // create a file
         val file = FileSpec.builder(packageName, fileName)
-            .addType(objectBuilder!!.build())
+            .addType(objectBuilder.build())
             .build()
-        file.writeTo(File(generatedSourceRoot))
+        file.writeTo(File(generatedSource))
 
         return true
     }
 
     private fun ProcessingEnvironment.noteMessage(message: () -> String) {
-        this.messager.printMessage(Diagnostic.Kind.NOTE, "${message()}\r")
+        this.messager.printMessage(Diagnostic.Kind.NOTE, message())
     }
 
     private fun ProcessingEnvironment.errorMessage(message: () -> String) {
-        this.messager.printMessage(Diagnostic.Kind.ERROR, "${message()}\r")
+        this.messager.printMessage(Diagnostic.Kind.ERROR, message())
     }
 
     companion object {
         const val KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
     }
-
 }

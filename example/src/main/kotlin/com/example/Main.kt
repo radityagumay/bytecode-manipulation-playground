@@ -3,7 +3,8 @@ package com.example
 import com.example.annotation.Constant
 
 fun main() {
+    println(ConstantGenerated.Hello)
 }
 
-@Constant(propName = "hello", propValue = "world")
+@Constant(propName = "Hello", propValue = "world")
 fun doWork() {}

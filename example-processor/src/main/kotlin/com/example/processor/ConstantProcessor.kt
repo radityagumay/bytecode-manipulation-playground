@@ -46,15 +46,16 @@ class ConstantProcessor : AbstractProcessor() {
         }
 
         val packageName = "com.example"
-        val fileName = "ConstantGenerated"
+        var fileName = ""
 
         // create object builder
-        val objectBuilder = TypeSpec.objectBuilder(fileName)
+        var objectBuilder: TypeSpec.Builder? = null
 
         for (element in elements) {
             val annotated = element.getAnnotation(Constant::class.java)
             val propName = annotated.propName
             val propValue = annotated.propValue
+            fileName = "${element.simpleName}".capitalize()
 
             // crate property
             val propBuilder = PropertySpec.builder(
@@ -63,12 +64,14 @@ class ConstantProcessor : AbstractProcessor() {
                 modifiers = arrayOf(KModifier.CONST, KModifier.FINAL)
             ).mutable(false).initializer("\"$propValue\"")
 
-            objectBuilder.addProperty(propBuilder.build())
+            objectBuilder = TypeSpec.objectBuilder(fileName).apply {
+                addProperty(propBuilder.build())
+            }
         }
 
         // create a file
         val file = FileSpec.builder(packageName, fileName)
-            .addType(objectBuilder.build())
+            .addType(objectBuilder!!.build())
             .build()
         file.writeTo(File(generatedSource))
 

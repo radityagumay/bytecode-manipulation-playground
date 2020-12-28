@@ -26,23 +26,23 @@ class ConstantProcessor : AbstractProcessor() {
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         if (roundEnv == null) {
             processingEnv.noteMessage { "RoundEnvironment is null hence skip the process." }
-            return false
+            return true // exit process
         }
 
         if (annotations == null || annotations.isEmpty()) {
             processingEnv.noteMessage { "TypeElements is null or empty hence skip the process." }
-            return false
+            return true
         }
 
         val elements = roundEnv.getElementsAnnotatedWith(Constant::class.java)
         if (elements.isEmpty()) {
             processingEnv.noteMessage { "Not able to find ${Constant::class.java} in RoundEnvironment." }
-            return false
+            return true
         }
 
         val generatedSource = processingEnv.options[KAPT_KOTLIN_GENERATED] ?: run {
             processingEnv.errorMessage { "Can't find target source." }
-            return false
+            return true
         }
 
         val packageName = "com.example"
@@ -75,7 +75,7 @@ class ConstantProcessor : AbstractProcessor() {
             .build()
         file.writeTo(File(generatedSource))
 
-        return true
+        return false
     }
 
     private fun ProcessingEnvironment.noteMessage(message: () -> String) {

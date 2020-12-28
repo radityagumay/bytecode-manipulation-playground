@@ -9,3 +9,8 @@ annotation class MyConstant(
     val propName: String,
     val propValue: String
 )
+
+
+@Retention(SOURCE)
+@Target(CLASS, CONSTRUCTOR)
+annotation class Builder

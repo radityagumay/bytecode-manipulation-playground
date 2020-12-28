@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.annotation.Builder
 import com.example.annotation.MyConstant
 import com.example.processor.MyGeneratedConstant
 
@@ -13,4 +14,10 @@ fun doSomething() {
 }
 
 @MyConstant(propName = "number", propValue = "world")
-fun doWork() {}
+fun doWork() { }
+
+
+@Builder
+data class Foo(
+    val message: String
+)

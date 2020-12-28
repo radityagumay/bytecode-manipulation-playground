@@ -1,1 +1,0 @@
-/Users/aditya.gumay/Gojek/AndroidProjects/asm/example-annotation/build/classes/kotlin/main/com/example/annotation/MyConstant.class

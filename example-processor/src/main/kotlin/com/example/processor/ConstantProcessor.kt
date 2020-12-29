@@ -78,14 +78,6 @@ class ConstantProcessor : AbstractProcessor() {
         return true
     }
 
-    private fun ProcessingEnvironment.noteMessage(message: () -> String) {
-        this.messager.printMessage(Diagnostic.Kind.NOTE, message())
-    }
-
-    private fun ProcessingEnvironment.errorMessage(message: () -> String) {
-        this.messager.printMessage(Diagnostic.Kind.ERROR, message())
-    }
-
     companion object {
         const val KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
     }

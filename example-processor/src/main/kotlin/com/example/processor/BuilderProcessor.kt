@@ -51,7 +51,6 @@ class BuilderProcessor : AbstractProcessor() {
 
         for (element in elements) {
             when (element.kind) {
-                ElementKind.CONSTRUCTOR -> writeForConstructor(element as TypeElement)
                 ElementKind.CLASS -> writeForClass(element as TypeElement)
                 else -> element.noteMessage {
                     """
@@ -184,27 +183,6 @@ class BuilderProcessor : AbstractProcessor() {
             // probably part of the same source tree as the annotated class
             className
         }
-    }
-
-    private fun writeForConstructor(element: TypeElement) {
-        processingEnv.noteMessage { "simpleName : ${element.simpleName}" }
-        processingEnv.noteMessage { "kind : ${element.kind}" }
-        processingEnv.noteMessage { "enclosedElements : ${element.enclosedElements}" }
-        processingEnv.noteMessage { "enclosingElement : ${element.enclosingElement}" }
-        processingEnv.noteMessage { "modifiers : ${element.modifiers}" }
-        processingEnv.noteMessage { "asType : ${element.asType()}" }
-        processingEnv.noteMessage { "annotationMirrors : ${element.annotationMirrors}" }
-
-        val packageName = "${element.enclosingElement}"
-        val fileName = "${element.simpleName}Builder".capitalize()
-
-        val classBuilder = TypeSpec.classBuilder(fileName)
-
-        val generatedSource = processingEnv.options[KAPT_KOTLIN_GENERATED]
-        val file = FileSpec.builder(packageName, fileName)
-            .addType(classBuilder.build())
-            .build()
-        file.writeTo(File(generatedSource))
     }
 
     private fun Element.noteMessage(message: () -> String) {

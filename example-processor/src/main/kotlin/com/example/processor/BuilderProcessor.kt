@@ -3,9 +3,7 @@ package com.example.processor
 import com.example.annotation.Builder
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import java.io.File
-import java.util.stream.Collectors
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
@@ -162,17 +160,13 @@ class BuilderProcessor : AbstractProcessor() {
 
     private fun TypeMirror.asKotlinType(): TypeName {
         return when (this) {
-            is PrimitiveType -> processingEnv.typeUtils.boxedClass(this).asKotlinClassName()
+            is PrimitiveType -> {
+                processingEnv.noteMessage { "TypeMirror is PrimitiveType" }
+                processingEnv.typeUtils.boxedClass(this).asKotlinClassName()
+            }
             is DeclaredType -> {
-                val typeName = this.asTypeElement().asKotlinClassName()
-                if (!this.typeArguments.isEmpty()) {
-                    val kotlinTypeArguments = typeArguments.stream()
-                        .map { it.asKotlinType() }
-                        .collect(Collectors.toList())
-                        .toTypedArray()
-                    return typeName.parameterizedBy(*kotlinTypeArguments)
-                }
-                return typeName
+                processingEnv.noteMessage { "TypeMirror is DeclaredType" }
+                this.asTypeElement().asKotlinClassName()
             }
             else -> this.asTypeElement().asKotlinClassName()
         }

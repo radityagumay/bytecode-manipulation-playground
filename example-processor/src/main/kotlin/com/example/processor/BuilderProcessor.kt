@@ -94,7 +94,7 @@ class BuilderProcessor : AbstractProcessor() {
         processingEnv.noteMessage { "asType : ${element.asType()}" }
         processingEnv.noteMessage { "annotationMirrors : ${element.annotationMirrors}" }
 
-        val packageName = "${element.enclosingElement}"
+        val packageName = "${element.enclosingElement}".toLowerCase()
         val fileName = "${element.simpleName}Builder".capitalize()
 
         val allMembers = processingEnv.elementUtils.getAllMembers(element)

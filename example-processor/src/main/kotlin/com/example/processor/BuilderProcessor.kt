@@ -5,7 +5,6 @@ import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.*
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -20,9 +19,7 @@ import javax.lang.model.util.ElementFilter.fieldsIn
 @AutoService(Processor::class)
 class BuilderProcessor : AbstractProcessor() {
 
-    override fun init(processingEnv: ProcessingEnvironment?) {
-        super.init(processingEnv)
-    }
+    private val plugins = mutableMapOf<Int, TypeElement>()
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -33,6 +30,14 @@ class BuilderProcessor : AbstractProcessor() {
     }
 
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
+        return if (roundEnv?.processingOver() == true) {
+            generatedPlugins()
+        } else {
+            processAnnotations(annotations, roundEnv)
+        }
+    }
+
+    private fun processAnnotations(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
         if (roundEnv == null) {
             processingEnv.noteMessage { "RoundEnvironment is null hence skip process." }
             return true
@@ -50,8 +55,19 @@ class BuilderProcessor : AbstractProcessor() {
         }
 
         for (element in elements) {
+            val typeElement = element as TypeElement
+
+            plugins[typeElement.qualifiedName.hashCode()] = typeElement
+            processingEnv.noteMessage { "Added $typeElement to map with id ${typeElement.qualifiedName.hashCode()}" }
+        }
+
+        return true
+    }
+
+    private fun generatedPlugins(): Boolean {
+        for ((k, element) in plugins) {
             when (element.kind) {
-                ElementKind.CLASS -> writeForClass(element as TypeElement)
+                ElementKind.CLASS -> writeForClass(element)
                 else -> element.noteMessage {
                     """
                         Target assignment is not appropriate for ${element.simpleName}, 

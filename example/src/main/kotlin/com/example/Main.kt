@@ -6,10 +6,10 @@ import com.example.annotation.Constant
 fun main() {
     println(DoWork.Hello)
 
-    AnimalBuilder
+    /*AnimalBuilder
         .habitat(Habitat.AIR)
         .name("bird")
-        .build().also(::println)
+        .build().also(::println)*/
 }
 
 @Constant(propName = "Hello", propValue = "world")

@@ -6,14 +6,17 @@ import com.example.person.AddressBuilder
 import com.example.person.SalaryBuilder
 import com.example.person.address.CoordinateBuilder
 import com.example.person.salary.BonusBuilder
+import org.openjdk.jol.info.ClassLayout
 
 fun main() {
     println(DoWork.Hello)
 
-    AnimalBuilder
+    val animal = AnimalBuilder
         .habitat(Habitat.AIR)
         .name("bird")
-        .build().also(::println)
+        .build()
+
+    println(ClassLayout.parseInstance(animal).toPrintable())
 
     PersonBuilder
         .name("raditya")

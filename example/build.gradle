@@ -11,6 +11,7 @@ dependencies {
 
     compileOnly project(":example-annotation")
     kapt project(":example-processor")
+    implementation "org.openjdk.jol:jol-core:0.10"
 
     testImplementation "junit:junit:4.12"
 }
